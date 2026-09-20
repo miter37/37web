@@ -1,0 +1,98 @@
+site:
+  id: example
+  name: Example App
+  version: 1
+
+match:
+  hosts:
+    - app.example.com
+  urlPatterns:
+    - "/*"
+  fingerprints:
+    - app_shell
+
+fingerprints:
+  app_shell:
+    all:
+      - element: main_navigation
+
+  order_list_v1:
+    all:
+      - fingerprint: app_shell
+      - url: "*/orders*"
+      - element: order_search
+
+  order_detail_v1:
+    all:
+      - fingerprint: app_shell
+      - url: "*/orders/*"
+      - element: order_status
+
+states:
+  order_list:
+    variants: [order_list_v1]
+  order_detail:
+    variants: [order_detail_v1]
+
+elements:
+  main_navigation:
+    strategies:
+      - role: navigation
+  order_search:
+    strategies:
+      - role: textbox
+        name: Order ID
+      - placeholder: Search orders
+      - testId: order-search
+  order_status:
+    strategies:
+      - testId: order-status
+      - css: "[data-field='status']"
+
+extractors:
+  current_status:
+    element: order_status
+    read: text
+
+preconditions:
+  authenticated:
+    type: element_visible
+    element: main_navigation
+
+urlTemplates:
+  order_detail: "/orders/{order_id}"
+
+actions:
+  open_order:
+    description: Open an order by stable URL template.
+    risk: read
+    lifecycle: encoded
+    allowedStates: [order_list, order_detail]
+    preconditions: [authenticated]
+    implementation:
+      kind: declarative
+      steps:
+        - op: goto
+          urlTemplate: order_detail
+        - op: wait_for
+          condition:
+            type: fingerprint
+            name: order_detail_v1
+          timeoutMs: 10000
+    verify:
+      - type: state_is
+        state: order_detail
+
+  set_status:
+    description: Example code-backed external write.
+    risk: external_write
+    lifecycle: encoded
+    allowedStates: [order_detail]
+    preconditions: [authenticated]
+    implementation:
+      kind: code
+      export: set_status
+    verify:
+      - type: extractor_equals
+        extractor: current_status
+        value: "{status}"

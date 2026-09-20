@@ -1,0 +1,26 @@
+site:
+  id: blog_naver_com
+  name: 네이버 블로그
+  version: 1
+match:
+  hosts:
+    - blog.naver.com
+    - section.blog.naver.com
+fingerprints: {}
+states: {}
+elements: {}
+preconditions: {}
+actions: {}
+# Note: original file used a flat legacy shape (id/name/host/auth/routes/editor_specs)
+# that the current schema validator rejects and that blocked `registry build` for every site.
+# Authoritative editor specs preserved below as comments:
+#   engine: SmartEditor ONE
+#   typing_method: CDP Input.dispatchMouseEvent & Input.insertText
+#   title selector: ".se-documentTitle p" (click_and_insert)
+#   body selector: ".se-component.se-text p" (click_and_insert_with_linebreaks)
+#   save button: "button.save_btn__FuUyN"
+#   publish layer button: "button.publish_btn__v_kS9"
+#   final publish button: ".layer_publish button, .modal_layer button (text: '발행')"
+#   routes: home https://section.blog.naver.com, write https://blog.naver.com/PostWriteForm.naver?blogId={blogId},
+#           direct_write https://blog.naver.com/GoBlogWrite.naver
+#   auth: 네이버 로그인 세션 유지 필요 (로그아웃 시 webctl browser reveal로 수동 인증)

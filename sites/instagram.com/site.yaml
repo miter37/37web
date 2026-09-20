@@ -1,0 +1,42 @@
+site:
+  id: www_instagram_com
+  name: www.instagram.com
+  version: 1
+match:
+  hosts:
+    - www.instagram.com
+fingerprints: {}
+states: {}
+elements: {}
+preconditions: {}
+actions: {}
+# Migrated from legacy flat shape (blocked registry build); original content preserved commented:
+# id: instagram.com
+# name: 인스타그램 (Instagram)
+# host: www.instagram.com
+# description: 인스타그램 사진 복수 첨부, 원본 비율 디폴트 설정, 캡션 작성, 게시물 수정 및 완전 삭제 자동화
+# 
+# auth:
+#   type: cookies
+#   notes: 브라우저 프로필 로그인 세션 영구 유지
+# 
+# upload_specs:
+#   create_button: "svg[aria-label*='새로운 게시물'], svg[aria-label*='만들기']"
+#   file_input: "input[type='file'] (DOM.describeNode로 backendNodeId 획득 후 DOM.setFileInputFiles로 복수 이미지 주입)"
+#   ratio_defaults:
+#     trigger: "svg[aria-label='자르기 선택']"
+#     default_option: "원본 (첫 번째 옵션 클릭하여 정사각형 크롭 방지 및 원본 비율 강제)"
+#   navigation:
+#     next_button: "div[role='button'] (text: '다음' / 'Next')"
+#   caption:
+#     input: "div[role='textbox'][contenteditable='true'] (Input.insertText로 캡션 입력)"
+#   submit:
+#     share_button: "div[role='button'] (text: '공유하기' / 'Share')"
+# 
+# post_management:
+#   options_menu: "svg[aria-label='옵션 더 보기'] (three dots)"
+#   edit_button: "button (text: '수정')"
+#   edit_complete: "div[role='button'], button (text: '완료')"
+#   delete_button: "button (text: '삭제')"
+#   confirm_delete: "button (text: '삭제' inside confirmation modal)"
+# 

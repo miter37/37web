@@ -1,0 +1,320 @@
+site:
+  id: finviz
+  name: finviz.com
+  version: 1
+
+match:
+  hosts:
+    - finviz.com
+    - www.finviz.com
+  fingerprints:
+    - quote_page
+    - screener_page
+    - market_news_page
+    - calendar_page
+
+# --- fingerprints: which kind of finviz page is currently open -------------
+# finviz has almost no ARIA roles or data-testid coverage outside the chart
+# toolbar. URL shape is the only reliable fingerprint signal on this site.
+fingerprints:
+  quote_page:
+    all:
+      - url: "*finviz.com/stock?t=*"
+  screener_page:
+    all:
+      - url: "*finviz.com/screener*"
+  market_news_page:
+    all:
+      - url: "*finviz.com/news*"
+  calendar_page:
+    all:
+      - url: "*finviz.com/calendar/*"
+
+states:
+  quote:
+    variants: [quote_page]
+  screener:
+    variants: [screener_page]
+  market_news:
+    variants: [market_news_page]
+  calendar:
+    variants: [calendar_page]
+
+# --- elements ----------------------------------------------------------
+# CSS is the primary strategy everywhere below because finviz exposes almost
+# no semantic roles/labels/testids for its data tables. These class/id names
+# read as intentional (BEM-ish, hand-written), not generated, so they are a
+# reasonable stability bet despite being CSS.
+elements:
+  ticker_symbol:
+    description: The big ticker symbol heading on a stock quote page (e.g. "NVDA").
+    strategies:
+      - css: .quote-header_ticker-wrapper h1
+
+  company_name:
+    description: Full company name on a stock quote page (e.g. "NVIDIA Corp").
+    strategies:
+      - css: .quote-header_ticker-wrapper h2
+
+  quote_price:
+    description: Last/current price on a stock quote page.
+    strategies:
+      - css: .quote-price_price
+
+  quote_change:
+    description: Dollar and percent change text next to the price.
+    strategies:
+      - css: .quote-price_change
+
+  fundamentals_table:
+    description: >
+      The full fundamentals grid on a stock quote page (Market Cap, P/E, EPS,
+      dozens more). Label/value pairs, not row records - read it through
+      get_stock_snapshot in actions.ts, not as a generic table.
+    strategies:
+      - css: table.snapshot-table2
+
+  ticker_news_table:
+    description: >
+      News widget on a stock quote page (company + related market news).
+      Distinct from market_news_row below - different page, different markup.
+    strategies:
+      - css: "#news-table"
+
+  analyst_ratings_table:
+    description: Analyst rating changes table on a stock quote page.
+    strategies:
+      - css: .js-table-ratings
+
+  insider_trades_table:
+    description: >
+      Insider trading table on a stock quote page. Matches the first
+      table.body-table on the page; if finviz ever adds another table with
+      that class above it, narrow this selector.
+    strategies:
+      - css: table.body-table
+
+  screener_table:
+    description: >
+      Results table on the Screener page. Renders inside a shadow root (the
+      same UI component family as the ad player's [part] attributes) - read
+      it with actions.ts's parseHeaderedTable (Playwright locators), never
+      with page.evaluate()/querySelectorAll, which cannot see inside it.
+    strategies:
+      - css: "#screener-table"
+
+  market_news_row:
+    description: One headline row on the /news.ashx market news page.
+    strategies:
+      - css: tr.news_table-row
+
+  calendar_table:
+    description: >
+      Results table shared by all three calendar sections (economic,
+      earnings, dividends). Same shadow-root markup as screener_table above -
+      same caveat applies.
+    strategies:
+      - css: .styled-table-new
+      - css: table
+
+  close_player_button:
+    description: >
+      Close button on finviz's Connatix inline video-ad player. Does not
+      always appear. IMPORTANT: a normal (even --force) mouse click on this
+      element frequently reports success without closing anything - its
+      handler only responds to a real keyboard Enter after focus. Use the
+      dismiss_ad_overlay code action, not a declarative click step.
+    strategies:
+      - css: "[part='inner-close-button']"
+
+extractors:
+  read_ticker_symbol:
+    element: ticker_symbol
+    read: text
+  read_company_name:
+    element: company_name
+    read: text
+  read_quote_price:
+    element: quote_price
+    read: text
+  read_quote_change:
+    element: quote_change
+    read: text
+  read_ticker_news_table:
+    element: ticker_news_table
+    read: text
+  read_analyst_ratings_table:
+    element: analyst_ratings_table
+    read: text
+  read_insider_trades_table:
+    element: insider_trades_table
+    read: text
+  read_screener_table:
+    element: screener_table
+    read: text
+  read_market_news_row:
+    element: market_news_row
+    read: text
+
+preconditions: {}
+
+urlTemplates:
+  stock_quote: "https://finviz.com/quote.ashx?t={ticker}"
+  market_news_home: "https://finviz.com/news.ashx"
+
+actions:
+  # Declarative example: simplest possible read action, one URL template plus
+  # one extractor. Prefer this style whenever a task is really this simple.
+  get_stock_price:
+    description: Navigate to a ticker's quote page and read its last price.
+    risk: read
+    lifecycle: candidate
+    implementation:
+      kind: declarative
+      steps:
+        - op: goto
+          urlTemplate: stock_quote
+    returns:
+      extractor: read_quote_price
+    verify:
+      - type: extractor_exists
+        extractor: read_quote_price
+
+  # Everything below needs structured multi-row output, optional query
+  # params, or the ad-overlay workaround, so it is a code action.
+  # See actions.ts for implementation notes.
+
+  get_stock_snapshot:
+    description: >
+      Navigate to a ticker's quote page and return {ticker, companyName,
+      price, change, fundamentals} in one call. fundamentals is every
+      label/value pair from the snapshot table (Market Cap, P/E, EPS, ...).
+    risk: read
+    lifecycle: verified
+    implementation:
+      kind: code
+      export: get_stock_snapshot
+    verify:
+      - type: extractor_exists
+        extractor: read_quote_price
+
+  get_stock_news:
+    description: >
+      News items shown on a ticker's quote page: [{time, headline, url}].
+      Requires an already-open ticker quote page session.
+    risk: read
+    lifecycle: verified
+    implementation:
+      kind: code
+      export: get_stock_news
+    verify:
+      - type: extractor_exists
+        extractor: read_ticker_news_table
+
+  get_analyst_ratings:
+    description: >
+      Analyst rating changes on a ticker's quote page: [{date, action, analyst,
+      rating, priceTarget}]. Requires an already-open ticker quote page - call
+      get_stock_price or get_stock_snapshot first if you don't have one open.
+    risk: read
+    lifecycle: verified
+    implementation:
+      kind: code
+      export: get_analyst_ratings
+    verify:
+      - type: extractor_exists
+        extractor: read_analyst_ratings_table
+
+  get_insider_trades:
+    description: >
+      Insider trading table on a ticker's quote page, one record per row
+      (relationship, date, transaction, shares, value, ...). Requires an
+      already-open ticker quote page, same as get_analyst_ratings.
+    risk: read
+    lifecycle: verified
+    implementation:
+      kind: code
+      export: get_insider_trades
+    verify:
+      - type: extractor_exists
+        extractor: read_insider_trades_table
+
+  run_screener:
+    description: >
+      Navigate to the Screener with optional filters/order and return parsed
+      rows. Input: { filters?: "cap_large,sec_technology" (comma-joined
+      finviz filter codes), order?: "-change" (finviz sort code, '-' prefix
+      = descending), view?: "111" (finviz view id, default Overview) }.
+      Omit filters for the full unfiltered screener.
+    risk: read
+    lifecycle: verified
+    implementation:
+      kind: code
+      export: run_screener
+    verify:
+      - type: extractor_exists
+        extractor: read_screener_table
+
+  get_market_news:
+    description: Site-wide news from /news.ashx, most recent first.
+    risk: read
+    lifecycle: candidate
+    implementation:
+      kind: code
+      export: get_market_news
+    verify:
+      - type: extractor_exists
+        extractor: read_market_news_row
+
+  get_earnings_calendar:
+    description: >
+      Earnings calendar rows. Input: { date?: "YYYY-MM-DD" }. Omit date for
+      the current week. Many days have no earnings; that is not an error -
+      the action returns an empty array, not a failure. Verification only
+      checks that the earnings calendar page itself loaded, not that it has
+      rows today, because a genuinely empty day is a correct result.
+    risk: read
+    lifecycle: candidate
+    implementation:
+      kind: code
+      export: get_earnings_calendar
+    verify:
+      - type: url_matches
+        pattern: "*calendar/earnings*"
+
+  get_dividends_calendar:
+    description: 'Dividends calendar rows. Input: { date?: "YYYY-MM-DD" }.'
+    risk: read
+    lifecycle: candidate
+    implementation:
+      kind: code
+      export: get_dividends_calendar
+    verify:
+      - type: url_matches
+        pattern: "*calendar/dividends*"
+
+  get_economic_calendar:
+    description: 'Economic calendar rows. Input: { date?: "YYYY-MM-DD" }.'
+    risk: read
+    lifecycle: candidate
+    implementation:
+      kind: code
+      export: get_economic_calendar
+    verify:
+      - type: url_matches
+        pattern: "*calendar/economic*"
+
+  dismiss_ad_overlay:
+    description: >
+      Best-effort: close the Connatix video-ad player if one is covering the
+      page right now. Safe to call on any page at any time; does nothing and
+      returns false if no player is open. All get_* actions above already
+      call this first, so you rarely need to run it directly. Deliberately
+      has no verify condition and will not be promoted past 'encoded': there
+      is no reliable postcondition when there was nothing to dismiss in the
+      first place, and that is a correct outcome, not a failure.
+    risk: read
+    lifecycle: encoded
+    implementation:
+      kind: code
+      export: dismiss_ad_overlay

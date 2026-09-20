@@ -1,0 +1,16 @@
+node_modules/
+.runtime/
+*.log
+.env
+.env.*
+!.env.example
+outputs/
+
+# Keep all reusable site knowledge and site-specific workflows.
+# Runtime state, generated outputs, and caches remain excluded above.
+sites/*
+!sites/
+!sites/*/
+sites/*/outputs/
+__pycache__/
+*.pyc

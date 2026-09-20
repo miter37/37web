@@ -1,0 +1,88 @@
+site:
+  id: chatgpt
+  name: chatgpt.com
+  version: 1
+match:
+  hosts:
+    - chatgpt.com
+  fingerprints:
+    - chat_page
+fingerprints:
+  chat_page:
+    any:
+      - url: "*chatgpt.com/"
+      - url: "*chatgpt.com/c/*"
+      - url: "*chatgpt.com/uc/*"
+states:
+  chat:
+    variants:
+      - chat_page
+elements:
+  prompt_textarea:
+    description: >
+      The message composer. The page always renders a SECOND, hidden decoy
+      <textarea> with the identical placeholder and aria-label (class contains
+      "fallbackTextarea") right alongside the real one, in both the signed-in
+      and guest UI. Every id/CSS/text-based strategy tried (id, placeholder,
+      aria-label, class-exclusion, even Playwright's `:visible` pseudo-class)
+      matched the decoy at least once and failed on a visibility timeout. The
+      decoy is not exposed with role "textbox" though, so
+      `page.getByRole('textbox')` reaches the real composer where those did
+      not - confirmed by ask_and_extract reaching `verified` lifecycle (two
+      independent successful runs) using this exact strategy.
+    strategies:
+      - role: textbox
+  submit_button:
+    description: >
+      Send button, next to the composer. type=submit is a structural HTML
+      attribute, not locale text, so this stays stable across languages.
+    strategies:
+      - css: form button[type=submit]:visible
+  copy_response_button:
+    description: >
+      Button that copies the latest response to the OS clipboard via the site's
+      own copy handler. CAVEAT: only verified with aria-label "응답 복사" under a
+      Korean (ko-KR) browser locale - no locale-independent attribute
+      (id/data-testid) was found for it. Under a different browser language this
+      label will read differently and this locator will not match;
+      ask_and_copy() in actions.ts returns `copied: false` rather than throwing
+      in that case.
+    strategies:
+      - css: "[aria-label='응답 복사']"
+preconditions: {}
+urlTemplates: {}
+actions:
+  ask_and_copy:
+    description: >
+      Ask ChatGPT a question and click its own "copy response" button so the
+      answer lands on the OS clipboard - matches what a person does by hand.
+      Input: { prompt: "..." }. Opens a fresh chat each call. Works whether the
+      browser is signed in or a guest. Returns { copied: boolean }; copied is
+      false (not an error) when the copy button couldn't be found, most likely a
+      non-Korean browser locale (see copy_response_button's caveat above). Read
+      the clipboard yourself afterward (e.g.
+      sites/chatgpt/scripts/save-clipboard.mjs) rather than asking this action
+      to return the answer text - that round-trip is what this action exists to
+      avoid.
+    risk: read
+    lifecycle: candidate
+    implementation:
+      kind: code
+      export: ask_and_copy
+    verify:
+      - type: fingerprint
+        name: chat_page
+  ask_and_extract:
+    description: >
+      Ask ChatGPT a question, mechanically wait for reasoning/streaming
+      completion, and directly return the complete answer text. Input: { prompt:
+      "..." }
+    risk: read
+    lifecycle: verified
+    implementation:
+      kind: code
+      export: ask_and_extract
+    verify:
+      - type: fingerprint
+        name: chat_page
+extractors: {}

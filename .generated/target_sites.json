@@ -1,0 +1,147 @@
+{
+  "generatedAt": "2026-09-19T16:13:40.204Z",
+  "entries": [
+    {
+      "id": "blog_naver_com",
+      "name": "네이버 블로그",
+      "path": "sites/blog.naver.com",
+      "match": {
+        "hosts": [
+          "blog.naver.com",
+          "section.blog.naver.com"
+        ]
+      }
+    },
+    {
+      "id": "chatgpt",
+      "name": "chatgpt.com",
+      "path": "sites/chatgpt",
+      "match": {
+        "hosts": [
+          "chatgpt.com"
+        ],
+        "fingerprints": [
+          "chat_page"
+        ]
+      }
+    },
+    {
+      "id": "finviz",
+      "name": "finviz.com",
+      "path": "sites/finviz",
+      "match": {
+        "hosts": [
+          "finviz.com",
+          "www.finviz.com"
+        ],
+        "fingerprints": [
+          "quote_page",
+          "screener_page",
+          "market_news_page",
+          "calendar_page"
+        ]
+      }
+    },
+    {
+      "id": "google",
+      "name": "www.google.com",
+      "path": "sites/google",
+      "match": {
+        "hosts": [
+          "www.google.com"
+        ]
+      }
+    },
+    {
+      "id": "naver",
+      "name": "land.naver.com",
+      "path": "sites/naver",
+      "match": {
+        "hosts": [
+          "land.naver.com",
+          "fin.land.naver.com"
+        ]
+      }
+    },
+    {
+      "id": "new_land_naver_com",
+      "name": "new.land.naver.com",
+      "path": "sites/new_land_naver_com",
+      "match": {
+        "hosts": [
+          "new.land.naver.com"
+        ]
+      }
+    },
+    {
+      "id": "search_naver_com",
+      "name": "search.naver.com",
+      "path": "sites/search_naver_com",
+      "match": {
+        "hosts": [
+          "search.naver.com"
+        ]
+      }
+    },
+    {
+      "id": "threads",
+      "name": "www.threads.com",
+      "path": "sites/threads",
+      "match": {
+        "hosts": [
+          "www.threads.com"
+        ]
+      }
+    },
+    {
+      "id": "trends_google_com",
+      "name": "trends.google.com",
+      "path": "sites/trends_google_com",
+      "match": {
+        "hosts": [
+          "trends.google.com"
+        ]
+      }
+    },
+    {
+      "id": "www_instagram_com",
+      "name": "www.instagram.com",
+      "path": "sites/instagram.com",
+      "match": {
+        "hosts": [
+          "www.instagram.com"
+        ]
+      }
+    },
+    {
+      "id": "www_threads_com",
+      "name": "www.threads.com",
+      "path": "sites/threads.com",
+      "match": {
+        "hosts": [
+          "www.threads.com"
+        ]
+      }
+    },
+    {
+      "id": "www_tripadvisor_co_kr",
+      "name": "www.tripadvisor.co.kr",
+      "path": "sites/tripadvisor.co.kr",
+      "match": {
+        "hosts": [
+          "www.tripadvisor.co.kr"
+        ]
+      }
+    },
+    {
+      "id": "x_com",
+      "name": "x.com",
+      "path": "sites/x.com",
+      "match": {
+        "hosts": [
+          "x.com"
+        ]
+      }
+    }
+  ]
+}

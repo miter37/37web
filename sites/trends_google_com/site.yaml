@@ -1,0 +1,54 @@
+site:
+  id: trends_google_com
+  name: trends.google.com
+  version: 1
+match:
+  hosts:
+    - trends.google.com
+fingerprints: {}
+states: {}
+elements:
+  tbody:
+    strategies:
+      - css: tbody
+        exact: false
+    description: Auto-encoded from a successful discovery extraction.
+  tr:
+    strategies:
+      - css: tr
+        exact: false
+    description: Auto-encoded from a successful discovery extraction.
+extractors:
+  read_tbody:
+    element: tbody
+    read: text
+  read_tr:
+    element: tr
+    read: text
+preconditions: {}
+urlTemplates: {}
+actions:
+  get_tbody:
+    description: Read read_tbody learned from discovery
+    risk: read
+    lifecycle: candidate
+    implementation:
+      kind: declarative
+      steps: []
+    returns:
+      extractor: read_tbody
+    verify:
+      - type: extractor_exists
+        extractor: read_tbody
+  get_tr:
+    description: Read read_tr learned from discovery
+    risk: read
+    lifecycle: candidate
+    implementation:
+      kind: declarative
+      steps: []
+    returns:
+      extractor: read_tr
+    verify:
+      - type: extractor_exists
+        extractor: read_tr

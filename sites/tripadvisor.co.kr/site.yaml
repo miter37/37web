@@ -1,0 +1,42 @@
+site:
+  id: www_tripadvisor_co_kr
+  name: www.tripadvisor.co.kr
+  version: 1
+match:
+  hosts:
+    - www.tripadvisor.co.kr
+fingerprints: {}
+states: {}
+elements: {}
+preconditions: {}
+actions: {}
+# Migrated from legacy flat shape (blocked registry build); original content preserved commented:
+# id: tripadvisor.co.kr
+# name: 트립어드바이저 (TripAdvisor)
+# host: www.tripadvisor.co.kr
+# description: 트립어드바이저 여행지 순위, 호텔/리조트 실시간 요금 및 객실 필터 검색 자동화
+# 
+# auth:
+#   type: cookies
+#   notes: DataDome 봇 감지 솔루션 사용. 첫 접속 시 1회 슬라이더 캡차(geo.captcha-delivery.com) 통과 필요 (reveal 모드로 수동 통과 후 세션 영구 보존)
+# 
+# routes:
+#   home: https://www.tripadvisor.co.kr
+#   destinations_best: https://www.tripadvisor.co.kr/TravelersChoice-Destinations
+#   hotels_bali: https://www.tripadvisor.co.kr/Hotels-g294226-Bali-Hotels.html
+#   hotels_canggu: https://www.tripadvisor.co.kr/Hotels-g311298-Canggu_North_Kuta_Badung_Regency_Bali-Hotels.html
+# 
+# search_specs:
+#   viewport:
+#     recommendation: "반드시 1440x900 이상의 데스크톱 뷰포트(Emulation.setDeviceMetricsOverride) 설정 필요 (모바일 뷰포트에서는 날짜/인원 검색창이 드롭다운 뒤로 숨음)"
+#   date_picker:
+#     checkin_button: "체크인 날짜가 표기된 버튼"
+#     date_cells: "aria-label 속성 ('YYYY년 M월 D일' 또는 'Month D, YYYY') 기반 탐색 및 물리 클릭"
+#   guest_picker:
+#     trigger_button: "객실/고객 수 버튼"
+#     room_increase_button: "aria-label='객실 수를 한 개 더 많게 설정' 버튼"
+#     adult_increase_button: "aria-label='성인 수를 한 명 더 많게 설정' 버튼"
+#     update_button: "텍스트 '업데이트' 버튼"
+#   results:
+#     pricing_model: "선택된 총 객실 수의 1박 요금 기준 실시간 집계"
+# 

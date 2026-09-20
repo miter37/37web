@@ -1,0 +1,55 @@
+site:
+  id: search_naver_com
+  name: search.naver.com
+  version: 1
+match:
+  hosts:
+    - search.naver.com
+fingerprints: {}
+states: {}
+elements:
+  table:
+    strategies:
+      - css: table
+        exact: false
+    description: Auto-encoded from a successful discovery extraction.
+  a_href_land_naver_com:
+    strategies:
+      - css: a[href*='land.naver.com']
+        exact: false
+    description: Auto-encoded from a successful discovery extraction.
+extractors:
+  read_table:
+    element: table
+    read: text
+  read_a_href_land_naver_com:
+    element: a_href_land_naver_com
+    read: attribute
+    attribute: href
+preconditions: {}
+urlTemplates: {}
+actions:
+  get_table:
+    description: Read read_table learned from discovery
+    risk: read
+    lifecycle: verified
+    implementation:
+      kind: declarative
+      steps: []
+    returns:
+      extractor: read_table
+    verify:
+      - type: extractor_exists
+        extractor: read_table
+  get_a_href_land_naver_com:
+    description: Read read_a_href_land_naver_com learned from discovery
+    risk: read
+    lifecycle: candidate
+    implementation:
+      kind: declarative
+      steps: []
+    returns:
+      extractor: read_a_href_land_naver_com
+    verify:
+      - type: extractor_exists
+        extractor: read_a_href_land_naver_com

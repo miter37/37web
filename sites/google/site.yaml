@@ -1,0 +1,33 @@
+site:
+  id: google
+  name: www.google.com
+  version: 1
+match:
+  hosts:
+    - www.google.com
+fingerprints: {}
+states: {}
+elements:
+  body:
+    strategies:
+      - css: body
+    description: Auto-encoded from a successful discovery extraction.
+extractors:
+  read_body:
+    element: body
+    read: text
+preconditions: {}
+urlTemplates: {}
+actions:
+  get_body:
+    description: Read read_body learned from discovery
+    risk: read
+    lifecycle: candidate
+    implementation:
+      kind: declarative
+      steps: []
+    returns:
+      extractor: read_body
+    verify:
+      - type: extractor_exists
+        extractor: read_body

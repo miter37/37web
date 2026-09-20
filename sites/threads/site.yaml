@@ -1,0 +1,14 @@
+site:
+  id: threads
+  name: www.threads.com
+  version: 1
+match:
+  hosts:
+    - www.threads.com
+fingerprints: {}
+states: {}
+elements: {}
+extractors: {}
+preconditions: {}
+urlTemplates: {}
+actions: {}

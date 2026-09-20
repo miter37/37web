@@ -1,0 +1,31 @@
+{
+  "name": "37web",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "browserd": "node scripts/launcher.mjs browserd",
+    "webctl": "node scripts/launcher.mjs webctl",
+    "registry:build": "node scripts/launcher.mjs webctl registry build",
+    "typecheck": "tsc --noEmit",
+    "install:browsers": "playwright install chromium",
+    "validate:sites": "node scripts/launcher.mjs webctl site validate",
+    "bootstrap": "node scripts/launcher.mjs bootstrap",
+    "doctor": "node scripts/launcher.mjs webctl browser status",
+    "test:scenarios": "node tests/chrome-manager-scenarios.mjs"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "playwright": "^1.55.0",
+    "yaml": "^2.0.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0",
+    "@types/node": "^22.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

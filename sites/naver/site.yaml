@@ -1,0 +1,111 @@
+site:
+  id: naver
+  name: land.naver.com
+  version: 1
+match:
+  hosts:
+  - land.naver.com
+  - fin.land.naver.com
+fingerprints:
+  home_page:
+    all:
+    - url: '*land.naver.com*'
+states:
+  home:
+    variants:
+    - home_page
+elements:
+  search_input:
+    description: Real estate complex or region search bar
+    strategies:
+    - placeholder: 단지, 지역검색
+    - label: 부동산 검색
+  home_logo:
+    description: Naver Real Estate Home link
+    strategies:
+    - role: link
+      name: 부동산 홈
+  news_link:
+    description: Real Estate News link
+    strategies:
+    - role: link
+      name: 뉴스
+  div_class_complex_div_class_article_div_class_detail:
+    strategies:
+    - css: div[class*='complex'], div[class*='article'], div[class*='detail']
+      exact: false
+    description: Auto-encoded from a successful discovery extraction.
+  h1_h2_h3_title:
+    strategies:
+    - css: h1, h2, h3, .title
+      exact: false
+    description: Auto-encoded from a successful discovery extraction.
+urlTemplates:
+  land_home: https://land.naver.com/
+  land_news: https://fin.land.naver.com/news
+actions:
+  goto_home:
+    description: Navigate to Naver Real Estate home
+    risk: read
+    lifecycle: candidate
+    implementation:
+      kind: declarative
+      steps:
+      - op: goto
+        urlTemplate: land_home
+    verify:
+    - type: element_visible
+      element: search_input
+  search_complex:
+    description: 'Search a complex/region name from the home search bar and press Enter. Naver navigates to new.land.naver.com/search
+      with suggestion results; if the query exactly matches one complex it may jump straight to the complex page
+      (new.land.naver.com/complexes/{id}). A promo popup ("매물·광고·고객을 부르는 기술") often covers the result list on first
+      load of new.land.naver.com — dismiss it with text "다시 보지 않기" or the dialog''s close (X) button before clicking
+      a result.
+
+      '
+    risk: read
+    lifecycle: verified
+    implementation:
+      kind: declarative
+      steps:
+      - op: fill
+        element: search_input
+        value: '{{query}}'
+      - op: press
+        element: search_input
+        key: Enter
+    verify:
+    - type: url_matches
+      pattern: '*new.land.naver.com*'
+  get_div_class_complex_div_class_article_div_class_detail:
+    description: Read read_div_class_complex_div_class_article_div_class_detail learned from discovery
+    risk: read
+    lifecycle: candidate
+    implementation:
+      kind: declarative
+      steps: []
+    returns:
+      extractor: read_div_class_complex_div_class_article_div_class_detail
+    verify:
+    - type: extractor_exists
+      extractor: read_div_class_complex_div_class_article_div_class_detail
+  get_h1_h2_h3_title:
+    description: Read read_h1_h2_h3_title learned from discovery
+    risk: read
+    lifecycle: candidate
+    implementation:
+      kind: declarative
+      steps: []
+    returns:
+      extractor: read_h1_h2_h3_title
+    verify:
+    - type: extractor_exists
+      extractor: read_h1_h2_h3_title
+extractors:
+  read_div_class_complex_div_class_article_div_class_detail:
+    element: div_class_complex_div_class_article_div_class_detail
+    read: text
+  read_h1_h2_h3_title:
+    element: h1_h2_h3_title
+    read: text

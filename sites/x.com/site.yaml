@@ -1,0 +1,80 @@
+site:
+  id: x_com
+  name: x.com
+  version: 2
+match:
+  hosts:
+    - x.com
+fingerprints:
+  logged_in: "textarea[data-testid='tweetTextarea_0']"
+elements:
+  compose_box:
+    - {testid: tweetTextarea_0}
+    - {css: "div[contenteditable='true'][role='textbox']"}
+  post_button:
+    - {testid: tweetButtonInline}
+    - {testid: tweetButton}
+  file_input:
+    - {css: "input[type='file'][accept*='image']"}
+  like_button:
+    - {css: "article [data-testid='like']"}
+  reply_button:
+    - {testid: reply}
+  reply_submit:
+    - {testid: tweetButton}
+  caret:
+    - {testid: caret}
+  confirm_delete:
+    - {testid: confirmationSheetConfirm}
+states:
+  home_timeline:
+    url: "https://x.com/home"
+  profile:
+    url: "https://x.com/{handle}"
+actions:
+  open_compose_home:
+    description: Open home timeline with the inline composer visible
+    risk: read
+    steps:
+      - goto: "https://x.com/home"
+    verify:
+      element: compose_box
+  type_compose:
+    description: Insert text into the inline composer (Input.insertText; snapshot/verify before submit)
+    risk: read
+    steps:
+      - fill: {element: compose_box, value: "{{text}}"}
+    verify:
+      state: home_timeline
+  post:
+    description: Submit the composed post. NEVER replay blindly; verify on profile page after.
+    risk: irreversible
+    steps:
+      - click: {element: post_button}
+    verify:
+      url: "https://x.com/home"
+  delete_own_post:
+    description: Delete a post via caret menu. Final confirm must NOT be clicked in drills.
+    risk: irreversible
+    steps:
+      - click: {element: caret}
+      - click: {role: menuitem, name: "Delete"}
+      - click: {element: confirm_delete}
+    verify:
+      url: "profile"
+  reply:
+    description: Reply to a tweet. scrollIntoView the target first (virtualized list).
+    risk: external_write
+    steps:
+      - click: {element: reply_button}
+      - fill: {element: compose_box, value: "{{text}}"}
+      - click: {element: reply_submit}
+    verify:
+      state: home_timeline
+  like:
+    description: Toggle like on a tweet (state change is reversible; allowed in drills).
+    risk: external_write
+    steps:
+      - click: {element: like_button}
+    verify:
+      state: home_timeline
